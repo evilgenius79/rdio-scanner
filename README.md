@@ -42,6 +42,14 @@ are unchanged, and no new mandatory configuration is required.
   tags are resolved to label strings before they are dropped into the existing
   review-and-import flow. Credentials are sent only to your own server and are
   never stored on disk.
+- **Conventional-frequency CSV import.** The same *Import Talkgroups*
+  dialog now also accepts RadioReference's **county/agency Frequencies
+  CSV** (the export with `Frequency Output, Frequency Input, …, Alpha
+  Tag, …, Tag` columns) in addition to the existing trunked-talkgroup
+  CSV. Conventional channels don't have talkgroup IDs of their own, so
+  the importer synthesises one by rounding the frequency to kHz
+  (`147.000000` MHz → id `147000`). The CSV shape is auto-detected at
+  upload; no extra radio button to pick.
 - **Database maintenance panel** — Admin → Tools → *Database maintenance* gives
   you two new actions:
   - **Compact database** — runs `VACUUM` on SQLite or `OPTIMIZE TABLE` on
@@ -167,6 +175,22 @@ earlier rounds:
   and unit importers.
 - **CSV reading uses `readAsText`** instead of the deprecated
   `readAsBinaryString`, so non-ASCII tag and group names round-trip.
+- **Uniden recorder filename no longer breaks the DirWatch mask.**
+  `_safe_label()` originally replaced spaces with `_`, but `_` is also
+  the DirWatch mask field separator. A system named "General Mobile R"
+  plus a channel named "462.5500 Simplex" produced
+  `..._General_Mobile_R_462.5500_Simplex_0.wav`, which the mask
+  couldn't split into `#SYSLBL` / `#TGLBL`. The recorder now uses `-`
+  for whitespace inside labels, keeping `_` reserved as the field
+  delimiter.
+- **Uniden recorder systemd unit no longer warns on every restart.**
+  `StartLimitBurst` / `StartLimitIntervalSec` were placed in
+  `[Service]`; modern systemd ignores them there and logs
+  `Unknown key 'StartLimitIntervalSec' in section [Service], ignoring`
+  on every (re)start. Moved to `[Unit]` where they belong. The unit
+  also picked up a flagged "EDIT THESE FOR YOUR INSTALL" block so the
+  `User=` / `/home/<user>/...` swap is obvious on Pi OS images where
+  the operator didn't pick `pi` as their username.
 
 ## New API endpoints (admin, JWT-protected)
 
