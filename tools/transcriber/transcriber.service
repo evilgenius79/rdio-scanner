@@ -1,0 +1,36 @@
+[Unit]
+Description=rdio-scanner companion: faster-whisper transcription of recorded calls
+After=network-online.target uniden-recorder.service
+Wants=network-online.target
+# Bound restart attempts so we don't spin if the model fails to load.
+StartLimitBurst=10
+StartLimitIntervalSec=120
+
+[Service]
+Type=simple
+# === EDIT THESE FOR YOUR INSTALL ===
+# The user that owns watch_dir / transcripts_dir. Same one you use for
+# the uniden-recorder service (e.g. `scanner` on a modern Pi OS image).
+User=pi
+Group=pi
+ExecStart=/usr/bin/python3 /home/pi/rdio-scanner/tools/transcriber/transcriber.py -c /home/pi/rdio-scanner/tools/transcriber/transcriber.ini
+# Whisper's first cold start downloads the model into ~/.cache/huggingface.
+# Set HOME explicitly so the cache lands in the user's home, not /root.
+Environment=HOME=/home/pi
+# ===================================
+Restart=on-failure
+RestartSec=10
+
+# Soft sandbox. We only need to read watch_dir and write transcripts_dir.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=read-only
+# Same value as transcripts_dir in the .ini. Add watch_dir if you point
+# the transcriber at a path that needs write access for tmp working
+# copies (the script writes its temp .working.wav into transcripts_dir,
+# so it already has write access there).
+ReadWritePaths=/home/pi/scanner-transcripts
+
+[Install]
+WantedBy=multi-user.target
