@@ -11,8 +11,9 @@
 # When squelch opens, the daemon splices the pre-roll out of the ring buffer
 # into a new WAV file and keeps appending live audio until squelch closes (or
 # the talkgroup changes mid-stream). The final file is named so rdio-scanner's
-# DirWatch with mask  #DATE_#TIME_#SYSLBL_#TGLBL_#HZ.wav  and
-# Auto-populate ON can ingest it directly.
+# DirWatch with mask  #DATE_#TIME_#SYSLBL_#TGLBL_#TG  (note: no `.wav` in the
+# mask -- DirWatch strips the extension before matching) and Auto-populate ON
+# can ingest it directly.
 #
 # License: GPL-3.0-or-later, same as rdio-scanner.
 
@@ -96,8 +97,10 @@ class GlgState:
             return None
 
         # Frequency in Hz on conventional scan; on trunked it's a TGID. Either
-        # way we treat it as the "#HZ" the mask is looking for, because the
-        # rdio-scanner mask only uses it to display, not to identify.
+        # way we surface it as the trailing field so rdio-scanner's `#TG`
+        # mask placeholder captures it as the talkgroup id (`call.Talkgroup`
+        # must be >0 to pass IsValid, otherwise ingest fails with
+        # "no talkgroup").
         freq_hz: Optional[int] = None
         try:
             freq_hz = int(parts[1])
@@ -187,8 +190,12 @@ class CallWriter:
         syslbl = _safe_label(glg.system_label or "system")
         tglbl = _safe_label(glg.talkgroup_label or "talkgroup")
         hz = glg.frequency_hz if glg.frequency_hz is not None else 0
-        # Mask compatible with rdio-scanner DirWatch:
-        #   #DATE_#TIME_#SYSLBL_#TGLBL_#HZ.wav
+        # Mask compatible with rdio-scanner DirWatch (extension `wav`):
+        #   #DATE_#TIME_#SYSLBL_#TGLBL_#TG
+        # The trailing field is the GLG first numeric value: a TGID on
+        # trunked scans, an Hz frequency on conventional. Either way #TG
+        # captures it as the talkgroup id so Auto-populate has something
+        # to key off.
         base = f"{date}_{clock}_{syslbl}_{tglbl}_{hz}"
         self.final_name = f"{base}.wav"
         self.part_path = output_dir / (self.final_name + ".part")

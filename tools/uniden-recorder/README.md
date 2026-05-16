@@ -69,7 +69,7 @@ In the admin panel:
    | Extension        | `wav`                                           |
    | System           | the system you created                          |
    | Talkgroup        | leave empty (parsed from the filename)          |
-   | Mask             | `#DATE_#TIME_#SYSLBL_#TGLBL_#HZ.wav`            |
+   | Mask             | `#DATE_#TIME_#SYSLBL_#TGLBL_#TG`                |
    | Frequency        | leave empty (parsed from the filename)          |
    | Delay            | 2000                                            |
 
