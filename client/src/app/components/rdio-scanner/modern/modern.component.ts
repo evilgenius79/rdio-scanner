@@ -13,7 +13,7 @@
  * ****************************************************************************
  */
 
-import { Component, EventEmitter, OnDestroy, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output } from '@angular/core';
 import {
     RdioScannerCall,
     RdioScannerConfig,
@@ -48,7 +48,10 @@ export class RdioScannerModernComponent implements OnDestroy {
         (event: RdioScannerEvent) => this.eventHandler(event),
     );
 
-    constructor(private rdioScannerService: RdioScannerService) {}
+    constructor(
+        private rdioScannerService: RdioScannerService,
+        private cdr: ChangeDetectorRef,
+    ) {}
 
     ngOnDestroy(): void {
         this.eventSubscription.unsubscribe();
@@ -113,6 +116,11 @@ export class RdioScannerModernComponent implements OnDestroy {
         return call?.id ?? call;
     }
 
+    /** Whether a call is actively playing right now (drives the EQ animation). */
+    get isPlaying(): boolean {
+        return !!this.currentCall && this.livefeedOn && !this.paused;
+    }
+
     // ---- service event firehose ----------------------------------------
 
     private eventHandler(event: RdioScannerEvent): void {
@@ -151,6 +159,14 @@ export class RdioScannerModernComponent implements OnDestroy {
         if ('listeners' in event) {
             this.listeners = event.listeners || 0;
         }
+
+        // Most call/playback events arrive from inside Web Audio's native
+        // callbacks, which sit outside Angular's NgZone. Without an
+        // explicit change-detection tick the view would silently stay on
+        // "Listening for the next call..." while audio is actually
+        // playing. Tick on every event so the EQ animation, the
+        // now-playing card, and the live/pause buttons all stay in sync.
+        this.cdr.detectChanges();
     }
 
     private pushRecent(call: RdioScannerCall): void {

@@ -118,12 +118,17 @@
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.30);
     }
 
+    .np-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+    }
     .np-label {
         font-size: 11px;
         letter-spacing: 1.5px;
         text-transform: uppercase;
         color: #64748b;
-        margin-bottom: 6px;
     }
     .np-system {
         font-size: 14px;
@@ -151,6 +156,64 @@
         color: #64748b;
         font-size: 14px;
         strong { color: #e8eef5; }
+
+        .eq {
+            margin: 0 auto 14px;
+            justify-content: center;
+        }
+    }
+}
+
+// ---- EQ / spectrum visualizer -----------------------------------------
+// Five animated vertical bars. Idle (livefeed on, no call) is dim and
+// gentle; active (audio actually playing) is bright and lively. Falls
+// back gracefully if prefers-reduced-motion is set.
+.eq {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 22px;
+    width: 28px;
+
+    span {
+        display: block;
+        width: 3px;
+        background: #34d399;
+        border-radius: 2px;
+        animation: eq-bar 900ms ease-in-out infinite;
+        height: 30%;
+        opacity: 0.5;
+    }
+    // Stagger the five bars so they don't move in lockstep.
+    span:nth-child(1) { animation-delay: -1200ms; }
+    span:nth-child(2) { animation-delay: -300ms; }
+    span:nth-child(3) { animation-delay: -700ms; }
+    span:nth-child(4) { animation-delay: -100ms; }
+    span:nth-child(5) { animation-delay: -500ms; }
+
+    // Idle state: dim and slower (the user is connected but nothing's
+    // actively playing).
+    &.idle span {
+        background: #475569;
+        animation-duration: 1600ms;
+        opacity: 0.55;
+    }
+
+    // Active state (a call is playing): brighter and faster.
+    &.active span {
+        opacity: 1;
+        animation-duration: 700ms;
+    }
+}
+@keyframes eq-bar {
+    0%, 100% { transform: scaleY(0.4); transform-origin: bottom; }
+    50%       { transform: scaleY(1.0); transform-origin: bottom; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .eq span {
+        animation: none;
+        transform: scaleY(0.7);
+        transform-origin: bottom;
     }
 }
 

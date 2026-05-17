@@ -28,7 +28,12 @@
     <!-- Now playing -------------------------------------------------- -->
     <section class="now-playing" *ngIf="currentCall as call">
         <div class="now-playing-card">
-            <div class="np-label">Now playing</div>
+            <div class="np-header">
+                <div class="np-label">Now playing</div>
+                <div class="eq" [class.active]="isPlaying" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </div>
             <div class="np-system">{{ systemLabel(call) }}</div>
             <div class="np-tg">{{ talkgroupLabel(call) }}</div>
             <div class="np-meta">
@@ -39,7 +44,12 @@
     </section>
     <section class="now-playing empty" *ngIf="!currentCall">
         <div class="empty-text">
-            <ng-container *ngIf="livefeedOn && !paused">Listening for the next call…</ng-container>
+            <ng-container *ngIf="livefeedOn && !paused">
+                <div class="eq idle" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+                <div>Listening for the next call…</div>
+            </ng-container>
             <ng-container *ngIf="livefeedOn && paused">Live feed paused.</ng-container>
             <ng-container *ngIf="!livefeedOn">Tap <strong>Live</strong> to start listening.</ng-container>
         </div>
