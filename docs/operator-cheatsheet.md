@@ -209,14 +209,24 @@ sudo journalctl -u rdio-scanner --since '30 sec ago' --no-pager | grep -i 'Rdio 
 
 ### Make it a one-shot command
 
-Save the block above as `/usr/local/bin/update-rdio-scanner`:
+The repo already ships the script — you just need to put it somewhere
+your shell will find it. On the Pi:
 
 ```sh
-sudo nano /usr/local/bin/update-rdio-scanner   # paste the block, save
+# Pull the script straight from the master branch on GitHub:
+sudo curl -fL -o /usr/local/bin/update-rdio-scanner \
+  https://raw.githubusercontent.com/evilgenius79/rdio-scanner/master/tools/update-rdio-scanner.sh
 sudo chmod +x /usr/local/bin/update-rdio-scanner
 
-# Then upgrades become:
+# Or if you've got the repo cloned at ~/rdio-scanner:
+sudo install -m 755 ~/rdio-scanner/tools/update-rdio-scanner.sh \
+  /usr/local/bin/update-rdio-scanner
+
+# Then upgrades become a single command:
 sudo update-rdio-scanner
+
+# Or pin to a specific release:
+sudo update-rdio-scanner v6.6.3-fork.5
 ```
 
 ### What's preserved during the upgrade
