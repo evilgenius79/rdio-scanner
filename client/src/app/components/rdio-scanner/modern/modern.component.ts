@@ -94,19 +94,39 @@ export class RdioScannerModernComponent implements OnDestroy {
 
     systemLabel(call: RdioScannerCall): string {
         if (!call) return '';
+        // Prefer the inlined systemData the service set on the call --
+        // it's always populated for calls the listener has access to, even
+        // when the listener's view of config.systems is trimmed by access
+        // controls or doesn't yet include auto-populated systems.
+        if (call.systemData?.label) return call.systemData.label;
         const sys = this.config?.systems?.find((s) => s.id === call.system);
         return sys?.label || `Sys ${call.system ?? '?'}`;
     }
 
     talkgroupLabel(call: RdioScannerCall): string {
         if (!call) return '';
+        // The display name. talkgroupData.label is the short tag
+        // ("Sheriff-Dispatc"); fall back to .name (the longer human name),
+        // then a config lookup, then "TG <id>" as last resort.
+        if (call.talkgroupData?.label) return call.talkgroupData.label;
+        if (call.talkgroupData?.name) return call.talkgroupData.name;
         const sys = this.config?.systems?.find((s) => s.id === call.system);
         const tg = sys?.talkgroups?.find((t) => t.id === call.talkgroup);
         return tg?.label || tg?.name || `TG ${call.talkgroup ?? '?'}`;
     }
 
+    /** Optional secondary line: prefer the long .name only if it adds info. */
+    talkgroupName(call: RdioScannerCall): string {
+        if (!call) return '';
+        const label = this.talkgroupLabel(call);
+        const name = call.talkgroupData?.name;
+        if (name && name !== label) return name;
+        return '';
+    }
+
     talkgroupTag(call: RdioScannerCall): string {
         if (!call) return '';
+        if (call.talkgroupData?.tag) return call.talkgroupData.tag;
         const sys = this.config?.systems?.find((s) => s.id === call.system);
         const tg = sys?.talkgroups?.find((t) => t.id === call.talkgroup);
         return tg?.tag || '';

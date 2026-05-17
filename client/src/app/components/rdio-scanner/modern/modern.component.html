@@ -36,6 +36,7 @@
             </div>
             <div class="np-system">{{ systemLabel(call) }}</div>
             <div class="np-tg">{{ talkgroupLabel(call) }}</div>
+            <div class="np-name" *ngIf="talkgroupName(call) as n">{{ n }}</div>
             <div class="np-meta">
                 <span *ngIf="talkgroupTag(call)">{{ talkgroupTag(call) }}</span>
                 <span class="np-time">{{ formatTime(call.dateTime) }}</span>
@@ -66,6 +67,7 @@
                 <div class="call-body">
                     <div class="call-system">{{ systemLabel(call) }}</div>
                     <div class="call-tg">{{ talkgroupLabel(call) }}</div>
+                    <div *ngIf="talkgroupName(call) as n" class="call-name">{{ n }}</div>
                     <div *ngIf="talkgroupTag(call)" class="call-tag">{{ talkgroupTag(call) }}</div>
                 </div>
                 <button class="play-btn" type="button" aria-label="Replay">
