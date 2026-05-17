@@ -25,6 +25,9 @@ import { RdioScannerEvent, RdioScannerLivefeedMode } from './rdio-scanner';
 import { RdioScannerService } from './rdio-scanner.service';
 import { RdioScannerNativeComponent } from './native/native.component';
 
+export type RdioScannerView = 'classic' | 'modern';
+const THEME_STORAGE_KEY = 'rdio-scanner-view';
+
 @Component({
     selector: 'rdio-scanner',
     styleUrls: ['./rdio-scanner.component.scss'],
@@ -39,6 +42,32 @@ export class RdioScannerComponent implements OnDestroy, OnInit {
     // whether to show the native-app prompt. Tracked here so we only fire
     // the timer once per page load.
     private nativePromptScheduled = false;
+
+    /** Which listener view is mounted. Persists per device in localStorage. */
+    view: RdioScannerView = this.readStoredView();
+
+    /** Toggle to the other view and persist the choice. */
+    setView(view: RdioScannerView): void {
+        this.view = view;
+        try {
+            window?.localStorage?.setItem(THEME_STORAGE_KEY, view);
+        } catch {
+            // localStorage can be unavailable in private-mode iframes; the
+            // switch still works for this session, just won't persist.
+        }
+        // Close any open sidenavs from the classic view when leaving it.
+        this.searchPanel?.close();
+        this.selectPanel?.close();
+    }
+
+    private readStoredView(): RdioScannerView {
+        try {
+            const v = window?.localStorage?.getItem(THEME_STORAGE_KEY);
+            return v === 'modern' ? 'modern' : 'classic';
+        } catch {
+            return 'classic';
+        }
+    }
 
     @ViewChild('searchPanel') private searchPanel: MatSidenav | undefined;
 

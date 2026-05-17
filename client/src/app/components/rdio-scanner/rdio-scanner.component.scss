@@ -28,6 +28,34 @@ $background-color: rgb(30, 30, 30);
   }
 }
 
+// Floating "try the modern view" button, only present in classic mode.
+// Bottom-right on phones, doesn't overlap the keypad on tablets.
+.view-switch-fab {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 0;
+  background: #34d399;
+  color: #0b1220;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  z-index: 50;
+  transition: transform 120ms ease, box-shadow 120ms ease;
+
+  &:hover, &:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.55);
+    outline: none;
+  }
+  &:active { transform: translateY(0); }
+}
+
 .panel {
   background-color: $background-color;
   display: flex;

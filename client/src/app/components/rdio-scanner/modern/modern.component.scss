@@ -1,0 +1,302 @@
+// Dark shell with light cards. Mobile-first.
+
+:host {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: #0b0f14;
+    color: #e8eef5;
+    font-family: 'Roboto', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.modern-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+// ---- Top bar -----------------------------------------------------------
+.top-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #1d242d;
+    background: #0e131a;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+.brand {
+    flex: 1 1 auto;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: #e8eef5;
+}
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #8aa0b6;
+}
+.dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #44525f;
+    box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+    transition: background 200ms ease;
+    &.on {
+        background: #34d399;
+        box-shadow: 0 0 6px rgba(52, 211, 153, 0.55);
+    }
+    &.paused {
+        background: #fbbf24;
+        box-shadow: 0 0 6px rgba(251, 191, 36, 0.55);
+    }
+}
+.state-text {
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    font-size: 11px;
+}
+.listeners { font-size: 12px; }
+
+.switch-btn {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    color: #8aa0b6;
+    border: 1px solid #1d242d;
+    cursor: pointer;
+    transition: background 150ms ease, color 150ms ease;
+    &:hover, &:focus-visible {
+        background: #141b24;
+        color: #e8eef5;
+        outline: none;
+    }
+}
+
+// ---- Auth hint ---------------------------------------------------------
+.auth-hint {
+    margin: 16px;
+    padding: 14px;
+    background: #1d242d;
+    border-radius: 12px;
+    color: #ffd7a8;
+    font-size: 14px;
+    button {
+        margin-left: 8px;
+        background: transparent;
+        border: 1px solid #ffd7a8;
+        color: #ffd7a8;
+        padding: 4px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+}
+
+// ---- Now playing -------------------------------------------------------
+.now-playing {
+    padding: 18px 16px 6px;
+
+    .now-playing-card {
+        background: #f8fafc;
+        color: #0b1220;
+        border-radius: 16px;
+        padding: 18px 18px 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.30);
+    }
+
+    .np-label {
+        font-size: 11px;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #64748b;
+        margin-bottom: 6px;
+    }
+    .np-system {
+        font-size: 14px;
+        color: #475569;
+        margin-bottom: 2px;
+    }
+    .np-tg {
+        font-size: 22px;
+        font-weight: 600;
+        color: #0b1220;
+        line-height: 1.2;
+    }
+    .np-meta {
+        margin-top: 10px;
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+        font-size: 13px;
+    }
+}
+.now-playing.empty {
+    .empty-text {
+        text-align: center;
+        padding: 36px 16px;
+        color: #64748b;
+        font-size: 14px;
+        strong { color: #e8eef5; }
+    }
+}
+
+// ---- Recent feed -------------------------------------------------------
+.recent {
+    flex: 1 1 auto;
+    padding: 14px 16px 100px; // bottom padding so action-bar doesn't cover the last card
+}
+.recent h2 {
+    margin: 6px 4px 10px;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: #8aa0b6;
+    font-weight: 500;
+}
+.recent-empty {
+    color: #64748b;
+    text-align: center;
+    margin: 24px 0;
+    font-size: 13px;
+}
+
+.call-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.call-card {
+    display: grid;
+    grid-template-columns: 56px 1fr 40px;
+    align-items: center;
+    gap: 12px;
+    background: #f8fafc;
+    color: #0b1220;
+    border-radius: 12px;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: transform 80ms ease, box-shadow 120ms ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.30);
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+    }
+    &:active { transform: translateY(0); }
+
+    .call-time {
+        font-variant-numeric: tabular-nums;
+        font-size: 13px;
+        color: #475569;
+    }
+    .call-body {
+        min-width: 0;
+        .call-system {
+            font-size: 12px;
+            color: #64748b;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .call-tg {
+            font-size: 15px;
+            font-weight: 600;
+            color: #0b1220;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .call-tag {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+    }
+    .play-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #0b1220;
+        color: #f8fafc;
+        border: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+}
+
+// ---- Bottom action bar -------------------------------------------------
+.action-bar {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 12px;
+    width: calc(100% - 24px);
+    max-width: 700px;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: rgba(14, 19, 26, 0.92);
+    backdrop-filter: blur(8px);
+    border-radius: 999px;
+    border: 1px solid #1d242d;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+
+    button {
+        flex: 1 1 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 44px;
+        border-radius: 999px;
+        border: 0;
+        background: #1d242d;
+        color: #e8eef5;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 120ms ease, color 120ms ease;
+        mat-icon { width: 20px; height: 20px; font-size: 20px; }
+        &.active {
+            background: #34d399;
+            color: #0b1220;
+        }
+        &.pause.active {
+            background: #fbbf24;
+        }
+        &:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+        &:hover:not(:disabled) {
+            background: #283544;
+        }
+    }
+}
+
+// Slightly larger touch targets on phones.
+@media (max-width: 480px) {
+    .top-bar { padding: 12px 14px; }
+    .now-playing { padding: 14px 12px 4px; }
+    .recent { padding: 12px 12px 96px; }
+    .call-card { padding: 14px 12px; }
+}

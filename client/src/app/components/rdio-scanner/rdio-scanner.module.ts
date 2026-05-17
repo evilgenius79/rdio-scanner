@@ -24,6 +24,7 @@ import { RdioScannerComponent } from './rdio-scanner.component';
 import { RdioScannerService } from './rdio-scanner.service';
 import { RdioScannerMainComponent } from './main/main.component';
 import { RdioScannerSupportComponent } from './main/support/support.component';
+import { RdioScannerModernComponent } from './modern/modern.component';
 import { RdioScannerNativeModule } from './native/native.module';
 import { RdioScannerSearchComponent } from './search/search.component';
 import { RdioScannerSelectComponent } from './select/select.component';
@@ -32,6 +33,7 @@ import { RdioScannerSelectComponent } from './select/select.component';
     declarations: [
         RdioScannerComponent,
         RdioScannerMainComponent,
+        RdioScannerModernComponent,
         RdioScannerSearchComponent,
         RdioScannerSelectComponent,
         RdioScannerSupportComponent,

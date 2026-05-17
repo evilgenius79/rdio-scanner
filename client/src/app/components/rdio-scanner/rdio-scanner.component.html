@@ -32,10 +32,20 @@
         </div>
     </mat-sidenav>
     <mat-sidenav-content>
-        <rdio-scanner-main
+        <rdio-scanner-main *ngIf="view === 'classic'"
             (openSearchPanel)="scrollTop(scrollableSearch); searchPanel.open(); searchComponent.searchCalls()"
             (openSelectPanel)="scrollTop(scrollableSelect); selectPanel.open();"
             (toggleFullscreen)="toggleFullscreen()">
         </rdio-scanner-main>
+        <rdio-scanner-modern *ngIf="view === 'modern'"
+            (switchToClassic)="setView('classic')">
+        </rdio-scanner-modern>
+        <!-- Floating switch-to-modern button, only visible in classic view -->
+        <button *ngIf="view === 'classic'" class="view-switch-fab" type="button"
+            (click)="setView('modern')"
+            aria-label="Switch to modern view"
+            title="Try the new modern view">
+            <mat-icon>view_agenda</mat-icon>
+        </button>
     </mat-sidenav-content>
 </mat-sidenav-container>

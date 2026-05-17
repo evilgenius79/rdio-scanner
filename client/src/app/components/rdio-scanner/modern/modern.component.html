@@ -1,0 +1,84 @@
+<div class="modern-shell">
+    <!-- Top status bar ----------------------------------------------- -->
+    <header class="top-bar">
+        <div class="brand">{{ branding || 'Rdio Scanner' }}</div>
+        <div class="status">
+            <span class="dot" [class.on]="livefeedOn" [class.paused]="paused"></span>
+            <span class="state-text">
+                <ng-container *ngIf="!livefeedOn">Offline</ng-container>
+                <ng-container *ngIf="livefeedOn && paused">Paused</ng-container>
+                <ng-container *ngIf="livefeedOn && !paused">Live</ng-container>
+            </span>
+            <span *ngIf="config?.showListenersCount" class="listeners">
+                · {{ listeners }} listener{{ listeners === 1 ? '' : 's' }}
+            </span>
+        </div>
+        <button class="switch-btn" type="button" (click)="switchToClassic.emit()"
+            aria-label="Switch to classic view">
+            <mat-icon>devices_other</mat-icon>
+        </button>
+    </header>
+
+    <!-- Auth notice -- modern doesn't render the PIN form -------------- -->
+    <div *ngIf="needsAuth" class="auth-hint">
+        This server is protected by a PIN.
+        <button type="button" (click)="switchToClassic.emit()">Sign in (classic view)</button>
+    </div>
+
+    <!-- Now playing -------------------------------------------------- -->
+    <section class="now-playing" *ngIf="currentCall as call">
+        <div class="now-playing-card">
+            <div class="np-label">Now playing</div>
+            <div class="np-system">{{ systemLabel(call) }}</div>
+            <div class="np-tg">{{ talkgroupLabel(call) }}</div>
+            <div class="np-meta">
+                <span *ngIf="talkgroupTag(call)">{{ talkgroupTag(call) }}</span>
+                <span class="np-time">{{ formatTime(call.dateTime) }}</span>
+            </div>
+        </div>
+    </section>
+    <section class="now-playing empty" *ngIf="!currentCall">
+        <div class="empty-text">
+            <ng-container *ngIf="livefeedOn && !paused">Listening for the next call…</ng-container>
+            <ng-container *ngIf="livefeedOn && paused">Live feed paused.</ng-container>
+            <ng-container *ngIf="!livefeedOn">Tap <strong>Live</strong> to start listening.</ng-container>
+        </div>
+    </section>
+
+    <!-- Recent calls ------------------------------------------------- -->
+    <section class="recent">
+        <h2>Recent</h2>
+        <p *ngIf="!recent.length" class="recent-empty">No calls yet.</p>
+        <ul class="call-list">
+            <li class="call-card" *ngFor="let call of recent; trackBy: trackByCall"
+                (click)="replay(call)">
+                <div class="call-time">{{ formatTime(call.dateTime) }}</div>
+                <div class="call-body">
+                    <div class="call-system">{{ systemLabel(call) }}</div>
+                    <div class="call-tg">{{ talkgroupLabel(call) }}</div>
+                    <div *ngIf="talkgroupTag(call)" class="call-tag">{{ talkgroupTag(call) }}</div>
+                </div>
+                <button class="play-btn" type="button" aria-label="Replay">
+                    <mat-icon>play_arrow</mat-icon>
+                </button>
+            </li>
+        </ul>
+    </section>
+
+    <!-- Bottom action bar -------------------------------------------- -->
+    <footer class="action-bar">
+        <button class="live" type="button" (click)="toggleLive()"
+            [class.active]="livefeedOn"
+            [attr.aria-pressed]="livefeedOn">
+            <mat-icon>{{ livefeedOn ? 'stop' : 'play_arrow' }}</mat-icon>
+            <span>{{ livefeedOn ? 'Stop' : 'Live' }}</span>
+        </button>
+        <button class="pause" type="button" (click)="togglePause()"
+            [disabled]="!livefeedOn"
+            [class.active]="paused"
+            [attr.aria-pressed]="paused">
+            <mat-icon>{{ paused ? 'play_arrow' : 'pause' }}</mat-icon>
+            <span>{{ paused ? 'Resume' : 'Pause' }}</span>
+        </button>
+    </footer>
+</div>
