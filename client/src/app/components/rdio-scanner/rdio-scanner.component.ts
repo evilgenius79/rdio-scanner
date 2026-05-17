@@ -35,6 +35,11 @@ export class RdioScannerComponent implements OnDestroy, OnInit {
 
     private livefeedMode: RdioScannerLivefeedMode = RdioScannerLivefeedMode.Offline;
 
+    // We wait for the first config push from the server before deciding
+    // whether to show the native-app prompt. Tracked here so we only fire
+    // the timer once per page load.
+    private nativePromptScheduled = false;
+
     @ViewChild('searchPanel') private searchPanel: MatSidenav | undefined;
 
     @ViewChild('selectPanel') private selectPanel: MatSidenav | undefined;
@@ -59,26 +64,19 @@ export class RdioScannerComponent implements OnDestroy, OnInit {
     }
 
     ngOnInit(): void {
-        /*
-         * BEGIN OF RED TAPE:
-         * 
-         * By modifying, deleting or disabling the following lines, you harm
-         * the open source project and its author.  Rdio Scanner represents a lot of
-         * investment in time, support, testing and hardware.
-         * 
-         * Be respectful, sponsor the project if you can, use native apps when possible.
-         * 
-         */
-        timer(10000).subscribe(() => {
-            const ua: string = navigator.userAgent;
-
-            if (ua.includes('Android') || ua.includes('iPad') || ua.includes('iPhone')) {
-                this.matSnackBar.openFromComponent(RdioScannerNativeComponent, { panelClass: 'snackbar-white' });
-            }
-        });
-        /**
-         * END OF RED TAPE.
-         */
+        // The native-app prompt is now scheduled inside eventHandler() once
+        // we've seen the server's config and confirmed showNativeAppPrompt
+        // is enabled. Upstream's hard-coded 10-second timer would fire even
+        // if the operator turned the prompt off; gating on the option means
+        // a fresh fork can disable it without patching out code.
+        //
+        // Upstream's "RED TAPE" comment asked downstream forks not to
+        // disable the prompt because it harms the native-app project.
+        // This fork makes the prompt opt-out via Admin -> Options ->
+        // "Show native-app prompt" (default ON, preserving upstream
+        // behaviour). Operators who choose to disable it on their install
+        // are doing so knowingly; the code path is still here for
+        // upstream-style deployments.
     }
 
     scrollTop(e: HTMLElement): void {
@@ -139,6 +137,26 @@ export class RdioScannerComponent implements OnDestroy, OnInit {
     private eventHandler(event: RdioScannerEvent): void {
         if (event.livefeedMode) {
             this.livefeedMode = event.livefeedMode;
+        }
+
+        if (event.config && !this.nativePromptScheduled) {
+            this.nativePromptScheduled = true;
+
+            // Default-true semantics: if the field is missing from the
+            // payload (older server, or a custom downstream that hasn't
+            // wired it through yet), keep showing the prompt so we don't
+            // silently break the upstream contract.
+            const showPrompt = event.config.showNativeAppPrompt !== false;
+            if (!showPrompt) {
+                return;
+            }
+
+            timer(10000).subscribe(() => {
+                const ua: string = navigator.userAgent;
+                if (ua.includes('Android') || ua.includes('iPad') || ua.includes('iPhone')) {
+                    this.matSnackBar.openFromComponent(RdioScannerNativeComponent, { panelClass: 'snackbar-white' });
+                }
+            });
         }
     }
 }

@@ -44,6 +44,7 @@ type Options struct {
 	PruneDays                   uint   `json:"pruneDays"`
 	SearchPatchedTalkgroups     bool   `json:"searchPatchedTalkgroups"`
 	ShowListenersCount          bool   `json:"showListenersCount"`
+	ShowNativeAppPrompt         bool   `json:"showNativeAppPrompt"`
 	SortTalkgroups              bool   `json:"sortTalkgroups"`
 	TagsToggle                  bool   `json:"tagsToggle"`
 	Time12hFormat               bool   `json:"time12hFormat"`
@@ -175,6 +176,13 @@ func (options *Options) FromMap(m map[string]any) *Options {
 		options.ShowListenersCount = defaults.options.showListenersCount
 	}
 
+	switch v := m["showNativeAppPrompt"].(type) {
+	case bool:
+		options.ShowNativeAppPrompt = v
+	default:
+		options.ShowNativeAppPrompt = defaults.options.showNativeAppPrompt
+	}
+
 	switch v := m["sortTalkgroups"].(type) {
 	case bool:
 		options.SortTalkgroups = v
@@ -224,6 +232,7 @@ func (options *Options) Read(db *Database) error {
 	options.PruneDays = defaults.options.pruneDays
 	options.SearchPatchedTalkgroups = defaults.options.searchPatchedTalkgroups
 	options.ShowListenersCount = defaults.options.showListenersCount
+	options.ShowNativeAppPrompt = defaults.options.showNativeAppPrompt
 	options.SortTalkgroups = defaults.options.sortTalkgroups
 	options.TagsToggle = defaults.options.tagsToggle
 
@@ -317,6 +326,11 @@ func (options *Options) Read(db *Database) error {
 				options.ShowListenersCount = v
 			}
 
+			switch v := m["showNativeAppPrompt"].(type) {
+			case bool:
+				options.ShowNativeAppPrompt = v
+			}
+
 			switch v := m["sortTalkgroups"].(type) {
 			case bool:
 				options.SortTalkgroups = v
@@ -398,6 +412,7 @@ func (options *Options) Write(db *Database) error {
 		"pruneDays":                   options.PruneDays,
 		"searchPatchedTalkgroups":     options.SearchPatchedTalkgroups,
 		"showListenersCount":          options.ShowListenersCount,
+		"showNativeAppPrompt":         options.ShowNativeAppPrompt,
 		"sortTalkgroups":              options.SortTalkgroups,
 		"tagsToggle":                  options.TagsToggle,
 		"time12hFormat":               options.Time12hFormat,

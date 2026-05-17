@@ -144,6 +144,7 @@ export interface Options {
     pruneDays?: number;
     searchPatchedTalkgroups?: boolean;
     showListenersCount?: boolean;
+    showNativeAppPrompt?: boolean;
     sortTalkgroups?: boolean;
     tagsToggle?: boolean;
     time12hFormat?: boolean;
@@ -599,6 +600,7 @@ export class RdioScannerAdminService implements OnDestroy {
             pruneDays: [options?.pruneDays, [Validators.required, Validators.min(0)]],
 			searchPatchedTalkgroups: [options?.searchPatchedTalkgroups],
 			showListenersCount: [options?.showListenersCount],
+            showNativeAppPrompt: [options?.showNativeAppPrompt],
             sortTalkgroups: [options?.sortTalkgroups],
             tagsToggle: [options?.tagsToggle],
             time12hFormat: [options?.time12hFormat],

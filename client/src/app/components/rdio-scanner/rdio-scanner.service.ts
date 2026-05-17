@@ -89,6 +89,7 @@ export class RdioScannerService implements OnDestroy {
         keypadBeeps: false,
         playbackGoesLive: false,
         showListenersCount: false,
+        showNativeAppPrompt: true,
         systems: [],
         tags: {},
         tagsToggle: false,
@@ -929,6 +930,11 @@ export class RdioScannerService implements OnDestroy {
                         keypadBeeps: config.keypadBeeps !== null && typeof config.keypadBeeps === 'object' ? config.keypadBeeps : {},
                         playbackGoesLive: typeof config.playbackGoesLive === 'boolean' ? config.playbackGoesLive : false,
                         showListenersCount: typeof config.showListenersCount === 'boolean' ? config.showListenersCount : false,
+                        // Default true so older servers that don't send the
+                        // field, or hand-rolled downstreams, still get the
+                        // upstream behaviour. Operators opt out via the
+                        // admin toggle.
+                        showNativeAppPrompt: typeof config.showNativeAppPrompt === 'boolean' ? config.showNativeAppPrompt : true,
                         systems: Array.isArray(config.systems) ? config.systems.slice() : [],
                         tags: typeof config.tags !== null && typeof config.tags === 'object' ? config.tags : {},
                         tagsToggle: typeof config.tagsToggle === 'boolean' ? config.tagsToggle : false,

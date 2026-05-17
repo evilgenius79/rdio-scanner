@@ -66,6 +66,7 @@ type DefaultOptions struct {
 	pruneDays                   uint
 	searchPatchedTalkgroups     bool
 	showListenersCount          bool
+	showNativeAppPrompt         bool
 	sortTalkgroups              bool
 	tagsToggle                  bool
 	time12hFormat               bool
@@ -111,6 +112,7 @@ var defaults Defaults = Defaults{
 		pruneDays:                   7,
 		searchPatchedTalkgroups:     false,
 		showListenersCount:          false,
+		showNativeAppPrompt:         true,
 		sortTalkgroups:              false,
 		tagsToggle:                  false,
 		time12hFormat:               false,
