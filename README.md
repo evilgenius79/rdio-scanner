@@ -247,14 +247,14 @@ rather run the unmodified release.
 
    | Operating system | Architecture | Use package                                     |
    | -----------------| ------------ | ----------------------------------------------- |
-   | FreeBSD          | amd64        | rdio-scanner-freebsd-amd64-v6.6.3-fork.4.zip    |
-   | Linux            | 386          | rdio-scanner-linux-386-v6.6.3-fork.4.zip        |
-   | Linux            | amd64        | rdio-scanner-linux-amd64-v6.6.3-fork.4.zip      |
-   | Linux            | arm          | rdio-scanner-linux-arm-v6.6.3-fork.4.zip        |
-   | Linux            | arm64        | rdio-scanner-linux-arm64-v6.6.3-fork.4.zip      |
-   | macOS            | amd64        | rdio-scanner-macos-amd64-v6.6.3-fork.4.zip      |
-   | macOS            | arm64        | rdio-scanner-macos-arm64-v6.6.3-fork.4.zip      |
-   | Windows          | amd64        | rdio-scanner-windows-amd64-v6.6.3-fork.4.zip    |
+   | FreeBSD          | amd64        | rdio-scanner-freebsd-amd64-v6.6.3-fork.5.zip    |
+   | Linux            | 386          | rdio-scanner-linux-386-v6.6.3-fork.5.zip        |
+   | Linux            | amd64        | rdio-scanner-linux-amd64-v6.6.3-fork.5.zip      |
+   | Linux            | arm          | rdio-scanner-linux-arm-v6.6.3-fork.5.zip        |
+   | Linux            | arm64        | rdio-scanner-linux-arm64-v6.6.3-fork.5.zip      |
+   | macOS            | amd64        | rdio-scanner-macos-amd64-v6.6.3-fork.5.zip      |
+   | macOS            | arm64        | rdio-scanner-macos-arm64-v6.6.3-fork.5.zip      |
+   | Windows          | amd64        | rdio-scanner-windows-amd64-v6.6.3-fork.5.zip    |
 
    Each release also ships a `SHA256SUMS` file you can use to verify the
    archive after download.
