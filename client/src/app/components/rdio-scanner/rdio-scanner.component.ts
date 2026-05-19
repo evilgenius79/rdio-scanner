@@ -43,12 +43,24 @@ export class RdioScannerComponent implements OnDestroy, OnInit {
     // the timer once per page load.
     private nativePromptScheduled = false;
 
-    /** Which listener view is mounted. Persists per device in localStorage. */
-    view: RdioScannerView = this.readStoredView();
+    /**
+     * Which listener view is mounted. Resolution order:
+     *   1. Per-device choice the user made via the in-app toggle
+     *      (localStorage `rdio-scanner-view`).
+     *   2. Server-side default supplied by Admin -> Options -> Default UI
+     *      view (defaults to 'classic' if unset / unknown).
+     *   3. 'classic' as a hard fallback before the first config arrives.
+     * Set in eventHandler when the first config event lands.
+     */
+    view: RdioScannerView = this.readStoredView() || 'classic';
+
+    /** True once the user has used the toggle (so we stop overriding from server). */
+    private viewExplicitlyChosen = !!this.readStoredView();
 
     /** Toggle to the other view and persist the choice. */
     setView(view: RdioScannerView): void {
         this.view = view;
+        this.viewExplicitlyChosen = true;
         try {
             window?.localStorage?.setItem(THEME_STORAGE_KEY, view);
         } catch {
@@ -60,13 +72,14 @@ export class RdioScannerComponent implements OnDestroy, OnInit {
         this.selectPanel?.close();
     }
 
-    private readStoredView(): RdioScannerView {
+    private readStoredView(): RdioScannerView | undefined {
         try {
             const v = window?.localStorage?.getItem(THEME_STORAGE_KEY);
-            return v === 'modern' ? 'modern' : 'classic';
+            if (v === 'modern' || v === 'classic') return v;
         } catch {
-            return 'classic';
+            // localStorage unavailable
         }
+        return undefined;
     }
 
     @ViewChild('searchPanel') private searchPanel: MatSidenav | undefined;
@@ -168,24 +181,36 @@ export class RdioScannerComponent implements OnDestroy, OnInit {
             this.livefeedMode = event.livefeedMode;
         }
 
-        if (event.config && !this.nativePromptScheduled) {
-            this.nativePromptScheduled = true;
-
-            // Default-true semantics: if the field is missing from the
-            // payload (older server, or a custom downstream that hasn't
-            // wired it through yet), keep showing the prompt so we don't
-            // silently break the upstream contract.
-            const showPrompt = event.config.showNativeAppPrompt !== false;
-            if (!showPrompt) {
-                return;
+        if (event.config) {
+            // Apply the admin-configured default view only if this device
+            // doesn't already have an explicit per-user choice. Picking
+            // the toggle "locks in" the user's preference even after
+            // future config refreshes.
+            if (!this.viewExplicitlyChosen && event.config.defaultUiView) {
+                const defaultView: RdioScannerView =
+                    event.config.defaultUiView === 'modern' ? 'modern' : 'classic';
+                if (this.view !== defaultView) {
+                    this.view = defaultView;
+                }
             }
 
-            timer(10000).subscribe(() => {
-                const ua: string = navigator.userAgent;
-                if (ua.includes('Android') || ua.includes('iPad') || ua.includes('iPhone')) {
-                    this.matSnackBar.openFromComponent(RdioScannerNativeComponent, { panelClass: 'snackbar-white' });
+            if (!this.nativePromptScheduled) {
+                this.nativePromptScheduled = true;
+
+                // Default-true semantics: if the field is missing from the
+                // payload (older server, or a custom downstream that hasn't
+                // wired it through yet), keep showing the prompt so we don't
+                // silently break the upstream contract.
+                const showPrompt = event.config.showNativeAppPrompt !== false;
+                if (showPrompt) {
+                    timer(10000).subscribe(() => {
+                        const ua: string = navigator.userAgent;
+                        if (ua.includes('Android') || ua.includes('iPad') || ua.includes('iPhone')) {
+                            this.matSnackBar.openFromComponent(RdioScannerNativeComponent, { panelClass: 'snackbar-white' });
+                        }
+                    });
                 }
-            });
+            }
         }
     }
 }

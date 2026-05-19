@@ -84,6 +84,7 @@ export class RdioScannerService implements OnDestroy {
     private categories: RdioScannerCategory[] = [];
 
     private config: RdioScannerConfig = {
+        defaultUiView: 'classic',
         dimmerDelay: false,
         groups: {},
         keypadBeeps: false,
@@ -924,6 +925,7 @@ export class RdioScannerService implements OnDestroy {
 
                     this.config = {
                         branding: typeof config.branding === 'string' ? config.branding : '',
+                        defaultUiView: config.defaultUiView === 'modern' ? 'modern' : 'classic',
                         dimmerDelay: typeof config.dimmerDelay === 'number' ? config.dimmerDelay : 5000,
                         email: typeof config.email === 'string' ? config.email : '',
                         groups: typeof config.groups !== null && typeof config.groups === 'object' ? config.groups : {},

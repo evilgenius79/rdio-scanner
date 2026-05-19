@@ -57,6 +57,7 @@ type DefaultDownstream struct {
 type DefaultOptions struct {
 	autoPopulate                bool
 	audioConversion             uint
+	defaultUiView               string
 	dimmerDelay                 uint
 	disableDuplicateDetection   bool
 	duplicateDetectionTimeFrame uint
@@ -103,6 +104,7 @@ var defaults Defaults = Defaults{
 	options: DefaultOptions{
 		audioConversion:             AUDIO_CONVERSION_ENABLED,
 		autoPopulate:                true,
+		defaultUiView:               "classic",
 		dimmerDelay:                 5000,
 		disableDuplicateDetection:   false,
 		duplicateDetectionTimeFrame: 500,

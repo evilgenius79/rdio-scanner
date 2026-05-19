@@ -188,6 +188,7 @@ func (client *Client) SendConfig(groups *Groups, options *Options, systems *Syst
 
 	var payload = map[string]any{
 		"branding":           options.Branding,
+		"defaultUiView":      options.DefaultUiView,
 		"dimmerDelay":        options.DimmerDelay,
 		"email":              options.Email,
 		"groups":             client.GroupsMap,

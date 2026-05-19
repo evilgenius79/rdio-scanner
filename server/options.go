@@ -34,6 +34,7 @@ type Options struct {
 	AudioConversion             uint   `json:"audioConversion"`
 	AutoPopulate                bool   `json:"autoPopulate"`
 	Branding                    string `json:"branding"`
+	DefaultUiView               string `json:"defaultUiView"`
 	DimmerDelay                 uint   `json:"dimmerDelay"`
 	DisableDuplicateDetection   bool   `json:"disableDuplicateDetection"`
 	DuplicateDetectionTimeFrame uint   `json:"duplicateDetectionTimeFrame"`
@@ -93,6 +94,19 @@ func (options *Options) FromMap(m map[string]any) *Options {
 	switch v := m["branding"].(type) {
 	case string:
 		options.Branding = v
+	}
+
+	switch v := m["defaultUiView"].(type) {
+	case string:
+		// Only honor a known value. Anything else (typo, empty string,
+		// future value we don't recognise) falls back to the default.
+		if v == "classic" || v == "modern" {
+			options.DefaultUiView = v
+		} else {
+			options.DefaultUiView = defaults.options.defaultUiView
+		}
+	default:
+		options.DefaultUiView = defaults.options.defaultUiView
 	}
 
 	switch v := m["dimmerDelay"].(type) {
@@ -223,6 +237,7 @@ func (options *Options) Read(db *Database) error {
 	options.adminPasswordNeedChange = defaults.adminPasswordNeedChange
 	options.AudioConversion = defaults.options.audioConversion
 	options.AutoPopulate = defaults.options.autoPopulate
+	options.DefaultUiView = defaults.options.defaultUiView
 	options.DimmerDelay = defaults.options.dimmerDelay
 	options.DisableDuplicateDetection = defaults.options.disableDuplicateDetection
 	options.DuplicateDetectionTimeFrame = defaults.options.duplicateDetectionTimeFrame
@@ -274,6 +289,13 @@ func (options *Options) Read(db *Database) error {
 			switch v := m["branding"].(type) {
 			case string:
 				options.Branding = v
+			}
+
+			switch v := m["defaultUiView"].(type) {
+			case string:
+				if v == "classic" || v == "modern" {
+					options.DefaultUiView = v
+				}
 			}
 
 			switch v := m["dimmerDelay"].(type) {
@@ -402,6 +424,7 @@ func (options *Options) Write(db *Database) error {
 		"audioConversion":             options.AudioConversion,
 		"autoPopulate":                options.AutoPopulate,
 		"branding":                    options.Branding,
+		"defaultUiView":               options.DefaultUiView,
 		"dimmerDelay":                 options.DimmerDelay,
 		"disableDuplicateDetection":   options.DisableDuplicateDetection,
 		"duplicateDetectionTimeFrame": options.DuplicateDetectionTimeFrame,

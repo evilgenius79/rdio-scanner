@@ -19,10 +19,15 @@ import {
     RdioScannerConfig,
     RdioScannerEvent,
     RdioScannerLivefeedMode,
+    RdioScannerPlaybackList,
+    RdioScannerSearchOptions,
+    RdioScannerSystem,
+    RdioScannerTalkgroup,
 } from '../rdio-scanner';
 import { RdioScannerService } from '../rdio-scanner.service';
 
 const RECENT_LIMIT = 100;
+const BROWSE_PAGE = 50;
 
 @Component({
     selector: 'rdio-scanner-modern',
@@ -43,6 +48,24 @@ export class RdioScannerModernComponent implements OnDestroy {
     branding = '';
     /** Server is asking for a PIN; modern view defers to classic for that flow. */
     needsAuth = false;
+
+    // ---- browse-past-calls state ---------------------------------------
+    /** Whether the slide-up browse sheet is visible. */
+    browseOpen = false;
+    /** yyyy-MM-dd, fed straight into <input type="date">. Empty = no date filter. */
+    browseDate = '';
+    /** Currently-selected system id (null = all systems). */
+    browseSystemId: number | null = null;
+    /** Currently-selected talkgroup id (null = all talkgroups in the chosen system). */
+    browseTalkgroupId: number | null = null;
+    /** Search results pulled from the server. */
+    browseResults: RdioScannerCall[] = [];
+    /** True between a search request and its response. */
+    browseLoading = false;
+    /** Total matching calls on the server (for the "X results" footer). */
+    browseCount = 0;
+    browseOffset = 0;
+    browseError = '';
 
     private eventSubscription = this.rdioScannerService.event.subscribe(
         (event: RdioScannerEvent) => this.eventHandler(event),
@@ -75,6 +98,85 @@ export class RdioScannerModernComponent implements OnDestroy {
         if (call?.id !== undefined) {
             this.rdioScannerService.loadAndPlay(call.id);
         }
+    }
+
+    // ---- browse-past-calls actions -------------------------------------
+
+    openBrowse(): void {
+        this.browseOpen = true;
+        if (!this.browseResults.length) {
+            this.runBrowseSearch();
+        }
+    }
+
+    closeBrowse(): void {
+        this.browseOpen = false;
+    }
+
+    runBrowseSearch(loadMore = false): void {
+        if (this.browseLoading) return;
+        this.browseError = '';
+        this.browseLoading = true;
+        if (!loadMore) {
+            this.browseOffset = 0;
+        }
+
+        const opts: RdioScannerSearchOptions = {
+            limit: BROWSE_PAGE,
+            offset: this.browseOffset,
+            // -1 = newest first (matches the classic search default).
+            sort: -1,
+        };
+        if (this.browseDate) {
+            // <input type="date"> gives yyyy-MM-dd in local time; parse it
+            // as start-of-day so the server query covers the whole day.
+            const parsed = new Date(`${this.browseDate}T00:00:00`);
+            if (!Number.isNaN(parsed.getTime())) {
+                opts.date = parsed;
+            }
+        }
+        if (this.browseSystemId !== null) {
+            opts.system = this.browseSystemId;
+        }
+        if (this.browseTalkgroupId !== null) {
+            opts.talkgroup = this.browseTalkgroupId;
+        }
+        this.rdioScannerService.searchCalls(opts);
+    }
+
+    loadMoreBrowse(): void {
+        if (this.browseLoading) return;
+        if (this.browseResults.length >= this.browseCount) return;
+        this.browseOffset = this.browseResults.length;
+        this.runBrowseSearch(true);
+    }
+
+    browseSelectionChange(): void {
+        // Reset talkgroup when the system changes so we don't carry a TG
+        // id that doesn't belong to the new system.
+        if (this.browseTalkgroupId !== null) {
+            const sys = this.config?.systems?.find((s) => s.id === this.browseSystemId);
+            if (!sys?.talkgroups?.some((tg) => tg.id === this.browseTalkgroupId)) {
+                this.browseTalkgroupId = null;
+            }
+        }
+    }
+
+    get browseSystems(): RdioScannerSystem[] {
+        return this.config?.systems ?? [];
+    }
+
+    get browseTalkgroups(): RdioScannerTalkgroup[] {
+        if (this.browseSystemId === null) return [];
+        const sys = this.config?.systems?.find((s) => s.id === this.browseSystemId);
+        return sys?.talkgroups ?? [];
+    }
+
+    formatBrowseDate(date: Date | string | undefined): string {
+        if (!date) return '';
+        const d = typeof date === 'string' ? new Date(date) : date;
+        if (Number.isNaN(d.getTime())) return '';
+        return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
     }
 
     // ---- display helpers ------------------------------------------------
@@ -180,6 +282,10 @@ export class RdioScannerModernComponent implements OnDestroy {
             this.listeners = event.listeners || 0;
         }
 
+        if ('playbackList' in event && event.playbackList) {
+            this.applyPlaybackList(event.playbackList);
+        }
+
         // Most call/playback events arrive from inside Web Audio's native
         // callbacks, which sit outside Angular's NgZone. Without an
         // explicit change-detection tick the view would silently stay on
@@ -196,6 +302,23 @@ export class RdioScannerModernComponent implements OnDestroy {
         this.recent.unshift(call);
         if (this.recent.length > RECENT_LIMIT) {
             this.recent.length = RECENT_LIMIT;
+        }
+    }
+
+    private applyPlaybackList(list: RdioScannerPlaybackList): void {
+        this.browseLoading = false;
+        this.browseCount = list.count ?? 0;
+        const incoming = list.results ?? [];
+        // Append for paginated load-more, replace otherwise. We detect
+        // "load more" by checking if the offset isn't 0.
+        if (list.options?.offset && list.options.offset > 0) {
+            // Avoid duplicating calls if the user hammers Load More.
+            const seen = new Set(this.browseResults.map((c) => c.id));
+            for (const c of incoming) {
+                if (!seen.has(c.id)) this.browseResults.push(c);
+            }
+        } else {
+            this.browseResults = incoming.slice();
         }
     }
 }

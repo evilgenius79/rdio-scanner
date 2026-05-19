@@ -75,6 +75,18 @@ are unchanged, and no new mandatory configuration is required.
   (serial port, audio device, samplerate) stay in the daemon's local
   `.ini`. Useful for tweaking call-splitting thresholds from the admin
   UI without SSH-ing into the Pi.
+- **Modern listener view** — mobile-first alternative to the classic
+  faux-LCD scanner display. Dark shell with light cards: now-playing
+  card on top, scrollable feed of recent calls below, single
+  Live/Pause action bar at the bottom. Same backend, same playback,
+  no power-user buttons cluttering the screen. A floating button in
+  the classic view invites a switch; per-device choice is remembered
+  in localStorage. Includes a slide-up **Browse** sheet that pulls
+  past calls from the DB with date / system / talkgroup filters and a
+  green animated EQ visualiser to confirm the stream is live.
+- **Admin → Options → Default UI view** — pick which listener view
+  (Classic or Modern) new visitors see on their first load. The
+  per-device toggle still overrides the default once a user has chosen.
 - **Trusted proxy mode** — new `trust_proxy` flag (CLI: `-trust_proxy=true`,
   ini: `trust_proxy = true`). When **off** (the default), `X-Forwarded-For`
   is ignored, so a direct client cannot spoof the header to dodge the per-IP
@@ -247,14 +259,14 @@ rather run the unmodified release.
 
    | Operating system | Architecture | Use package                                     |
    | -----------------| ------------ | ----------------------------------------------- |
-   | FreeBSD          | amd64        | rdio-scanner-freebsd-amd64-v6.6.3-fork.5.zip    |
-   | Linux            | 386          | rdio-scanner-linux-386-v6.6.3-fork.5.zip        |
-   | Linux            | amd64        | rdio-scanner-linux-amd64-v6.6.3-fork.5.zip      |
-   | Linux            | arm          | rdio-scanner-linux-arm-v6.6.3-fork.5.zip        |
-   | Linux            | arm64        | rdio-scanner-linux-arm64-v6.6.3-fork.5.zip      |
-   | macOS            | amd64        | rdio-scanner-macos-amd64-v6.6.3-fork.5.zip      |
-   | macOS            | arm64        | rdio-scanner-macos-arm64-v6.6.3-fork.5.zip      |
-   | Windows          | amd64        | rdio-scanner-windows-amd64-v6.6.3-fork.5.zip    |
+   | FreeBSD          | amd64        | rdio-scanner-freebsd-amd64-v6.6.3-fork.6.zip    |
+   | Linux            | 386          | rdio-scanner-linux-386-v6.6.3-fork.6.zip        |
+   | Linux            | amd64        | rdio-scanner-linux-amd64-v6.6.3-fork.6.zip      |
+   | Linux            | arm          | rdio-scanner-linux-arm-v6.6.3-fork.6.zip        |
+   | Linux            | arm64        | rdio-scanner-linux-arm64-v6.6.3-fork.6.zip      |
+   | macOS            | amd64        | rdio-scanner-macos-amd64-v6.6.3-fork.6.zip      |
+   | macOS            | arm64        | rdio-scanner-macos-arm64-v6.6.3-fork.6.zip      |
+   | Windows          | amd64        | rdio-scanner-windows-amd64-v6.6.3-fork.6.zip    |
 
    Each release also ships a `SHA256SUMS` file you can use to verify the
    archive after download.

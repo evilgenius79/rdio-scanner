@@ -94,6 +94,7 @@ export enum RdioScannerCategoryType {
 export interface RdioScannerConfig {
     afs?: string;
     branding?: string;
+    defaultUiView?: 'classic' | 'modern';
     dimmerDelay: number | false;
     email?: string;
     groups: { [key: string]: { [key: number]: number[] } };

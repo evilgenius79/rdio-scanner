@@ -179,6 +179,20 @@
     </div>
     <div class="row">
         <p>
+            <span class="mat-body">Default UI view</span><br>
+            <span class="mat-caption">Which listener view a visitor sees on their first visit. Once they pick a
+                view via the in-app toggle, that choice is remembered per-device and overrides this default.
+                Classic is the original faux-LCD scanner display; Modern is the mobile-friendly card feed.</span>
+        </p>
+        <mat-form-field floatLabel="never">
+            <mat-select formControlName="defaultUiView" placeholder="View">
+                <mat-option value="classic">Classic</mat-option>
+                <mat-option value="modern">Modern</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+    <div class="row">
+        <p>
             <span class="mat-body">Show native-app prompt</span><br>
             <span class="mat-caption">Show the "works natively on Android / iOS" pop-up to mobile visitors a few
                 seconds after page load. Turn this off if your fork is not the upstream Saubeo build (no Android /

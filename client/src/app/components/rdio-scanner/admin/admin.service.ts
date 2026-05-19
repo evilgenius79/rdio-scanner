@@ -134,6 +134,7 @@ export interface Options {
     audioConversion?: 0 | 1 | 2 | 3;
     autoPopulate?: boolean;
     branding?: string;
+    defaultUiView?: 'classic' | 'modern';
     dimmerDelay?: number;
     disableDuplicateDetection?: boolean;
     duplicateDetectionTimeFrame?: number;
@@ -590,6 +591,7 @@ export class RdioScannerAdminService implements OnDestroy {
             audioConversion: [options?.audioConversion],
             autoPopulate: [options?.autoPopulate],
             branding: [options?.branding],
+            defaultUiView: [options?.defaultUiView || 'classic'],
             dimmerDelay: [options?.dimmerDelay, [Validators.required, Validators.min(0)]],
             disableDuplicateDetection: [options?.disableDuplicateDetection],
             duplicateDetectionTimeFrame: [options?.duplicateDetectionTimeFrame, [Validators.required, Validators.min(0)]],

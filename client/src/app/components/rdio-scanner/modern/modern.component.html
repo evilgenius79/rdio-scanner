@@ -13,6 +13,10 @@
                 · {{ listeners }} listener{{ listeners === 1 ? '' : 's' }}
             </span>
         </div>
+        <button class="switch-btn" type="button" (click)="openBrowse()"
+            aria-label="Browse past calls">
+            <mat-icon>search</mat-icon>
+        </button>
         <button class="switch-btn" type="button" (click)="switchToClassic.emit()"
             aria-label="Switch to classic view">
             <mat-icon>devices_other</mat-icon>
@@ -75,6 +79,74 @@
                 </button>
             </li>
         </ul>
+    </section>
+
+    <!-- Browse past calls sheet --------------------------------------- -->
+    <div *ngIf="browseOpen" class="browse-backdrop" (click)="closeBrowse()"></div>
+    <section *ngIf="browseOpen" class="browse-sheet" role="dialog" aria-label="Browse past calls">
+        <header class="browse-header">
+            <h3>Browse</h3>
+            <button type="button" class="browse-close" (click)="closeBrowse()" aria-label="Close">
+                <mat-icon>close</mat-icon>
+            </button>
+        </header>
+        <div class="browse-filters">
+            <label class="browse-field">
+                <span>Date</span>
+                <input type="date" [(ngModel)]="browseDate">
+            </label>
+            <label class="browse-field">
+                <span>System</span>
+                <select [(ngModel)]="browseSystemId" (change)="browseSelectionChange()">
+                    <option [ngValue]="null">All systems</option>
+                    <option *ngFor="let s of browseSystems" [ngValue]="s.id">{{ s.label }}</option>
+                </select>
+            </label>
+            <label class="browse-field" *ngIf="browseSystemId !== null">
+                <span>Talkgroup</span>
+                <select [(ngModel)]="browseTalkgroupId">
+                    <option [ngValue]="null">All talkgroups</option>
+                    <option *ngFor="let t of browseTalkgroups" [ngValue]="t.id">{{ t.label || t.name }}</option>
+                </select>
+            </label>
+            <button type="button" class="browse-search" (click)="runBrowseSearch()"
+                [disabled]="browseLoading">
+                <mat-icon>search</mat-icon>
+                {{ browseLoading ? 'Searching…' : 'Search' }}
+            </button>
+        </div>
+
+        <div class="browse-results">
+            <p *ngIf="browseError" class="browse-error">{{ browseError }}</p>
+            <p *ngIf="!browseLoading && !browseResults.length && !browseError"
+                class="browse-empty">No calls match those filters.</p>
+            <p *ngIf="browseResults.length" class="browse-count">
+                {{ browseResults.length }} of {{ browseCount }} call{{ browseCount === 1 ? '' : 's' }}
+            </p>
+            <ul class="call-list">
+                <li class="call-card" *ngFor="let call of browseResults; trackBy: trackByCall"
+                    (click)="replay(call); closeBrowse()">
+                    <div class="call-time">
+                        <div>{{ formatBrowseDate(call.dateTime) }}</div>
+                        <div class="call-time-sm">{{ formatTime(call.dateTime) }}</div>
+                    </div>
+                    <div class="call-body">
+                        <div class="call-system">{{ systemLabel(call) }}</div>
+                        <div class="call-tg">{{ talkgroupLabel(call) }}</div>
+                        <div *ngIf="talkgroupName(call) as n" class="call-name">{{ n }}</div>
+                        <div *ngIf="talkgroupTag(call)" class="call-tag">{{ talkgroupTag(call) }}</div>
+                    </div>
+                    <button class="play-btn" type="button" aria-label="Play">
+                        <mat-icon>play_arrow</mat-icon>
+                    </button>
+                </li>
+            </ul>
+            <button *ngIf="browseResults.length && browseResults.length < browseCount"
+                type="button" class="browse-loadmore"
+                (click)="loadMoreBrowse()" [disabled]="browseLoading">
+                {{ browseLoading ? 'Loading…' : 'Load more' }}
+            </button>
+        </div>
     </section>
 
     <!-- Bottom action bar -------------------------------------------- -->
